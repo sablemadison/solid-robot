@@ -48,52 +48,78 @@ class Board():
                 desired_move = desired_move - 9
         return False
 
-    def findHorizontalWins(self, smallest, playerNum):
-        winning_combo = []
-        for num in range(3):
-            smallest = smallest + 1
-            if self.board[smallest] == playerNum:
-                winning_combo.append(smallest)
-        if len(winning_combo) == 3:
-            return True
+    def isHorizontalWin(self, playerNum):
+        if self.recent_move < 9:
+            min = 0
+            max = 8
+        if self.recent_move < 18:
+            min = 9
+            max = 17
+        if self.recent_move < 27:
+            min = 18
+            max = 26
+        if self.recent_move < 45:
+            min = 36
+            max = 44
+        else:
+            min = 44
+            max = 53
+        if self.recent_move + 4 in range(min, max) and self.board[self.recent_move + 4] == playerNum:
+            starting_idx = self.recent_move + 4
+            winning_row = []
+            for i in range(4):
+                starting_idx = starting_idx - 1
+                if self.board[starting_idx] == playerNum:
+                    winning_row.append(self.board[starting_idx])
+            if len(winning_row) > 3:
+                return True
+        if self.recent_move - 4 in range(min, max) and self.board[self.recent_move - 4] == playerNum:
+            starting_idx = self.recent_move -4
+            winning_row = []
+            for i in range(4):
+                starting_idx = starting_idx + 1
+                if self.board[starting_idx] == playerNum:
+                    winning_row.append(self.board[starting_idx])
+            if len(winning_row) > 3:
+                return True
+        
         else:
             return False
         
-    def isWinner(self, playerNum):
-        index_dirs = [1, 8, 9, 10]
+    def isWin(self, playerNum):
+        index_dirs = [8, 9, 10]
         for idx in index_dirs:
+            print('index:', idx)
             furthest = idx * 4
-                
+            print('furthest:', furthest)
+            winning_row = []   
             if self.recent_move + furthest in range(54) and self.board[self.recent_move + furthest] == playerNum:
                 smallest = self.recent_move
                 
-                winning_combo = []
-                winning_combo.append(smallest)
-                winning_combo.append(furthest)
+                winning_row.append(smallest)
+                winning_row.append(furthest)
                 incremented_idx = smallest + idx
                 for num in range(3): 
                     
                     if self.board[incremented_idx] == playerNum:
-                        winning_combo.append(incremented_idx)
+                        winning_row.append(incremented_idx)
                     incremented_idx = incremented_idx + idx
 
-                if len(winning_combo) == 5:
+                if len(winning_row) >= 5:
                     return True 
                 
             if self.recent_move - furthest in range(54) and self.board[self.recent_move - furthest] == playerNum:
                 smallest = furthest
-                winning_combo = []
-                winning_combo.append(smallest)
-                winning_combo.append(self.recent_move)
+                winning_row.append(smallest)
+                winning_row.append(self.recent_move)
                 
                 incremented_idx = smallest + idx
                 for num in range(3): 
                     
-                    
                     if self.board[incremented_idx] == playerNum:
-                        winning_combo.append(incremented_idx)
+                        winning_row.append(incremented_idx)
                     incremented_idx = incremented_idx + idx
-                if len(winning_combo) == 5:
+                if len(winning_row) >= 5:
                     return True
                 
         return False

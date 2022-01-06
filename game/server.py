@@ -17,8 +17,6 @@ s.listen(2)
 print("Server started, listening for connections")
 
 players = [Player("Player 1"), Player("Player 2")]
-#p1 = Player("Player 1")
-#p2 = Player("Player 2")
 
 def startNewGame():
     valid_session = True
@@ -31,9 +29,9 @@ def startNewGame():
         b.draw_board()
           
         valid_move = False
-        if b.isWinner(currentPlayer):
-                    print(f"{players[currentPlayer].name} wins!")
-                    break
+        if b.isWin(currentPlayer) or b.isHorizontalWin(currentPlayer):
+            print(f"{players[currentPlayer].name} wins!")
+            break
                 
         if b.moves_played > 54:
             print(f"Tie! Game over")
