@@ -1,4 +1,5 @@
 class Board():
+    #python3 server.py
     def __init__(self):
         self.board = [-1 for _ in range(54)]
         self.recent_move = 0
@@ -64,62 +65,63 @@ class Board():
         else:
             min = 44
             max = 53
-        if self.recent_move + 4 in range(min, max) and self.board[self.recent_move + 4] == playerNum:
-            starting_idx = self.recent_move + 4
+        if self.recent_move + 1 in range(min, max) and self.board[self.recent_move + 1] == playerNum:
+            starting_idx = self.recent_move + 1
             winning_row = []
-            for i in range(4):
-                starting_idx = starting_idx - 1
-                if self.board[starting_idx] == playerNum:
-                    winning_row.append(self.board[starting_idx])
-            if len(winning_row) > 3:
+            for i in range(3):
+                starting_idx += 1
+                try: 
+                    if self.board[starting_idx] == playerNum:
+                        winning_row.append(self.board[starting_idx])
+                except IndexError:
+                    continue
+                
+            if len(winning_row) >= 3:
                 return True
-        if self.recent_move - 4 in range(min, max) and self.board[self.recent_move - 4] == playerNum:
-            starting_idx = self.recent_move -4
+        if self.recent_move - 1 in range(min, max) and self.board[self.recent_move - 1] == playerNum:
+            starting_idx = self.recent_move - 1
             winning_row = []
-            for i in range(4):
-                starting_idx = starting_idx + 1
-                if self.board[starting_idx] == playerNum:
-                    winning_row.append(self.board[starting_idx])
-            if len(winning_row) > 3:
+            for i in range(3):
+                starting_idx -= 1
+                try:
+                    if self.board[starting_idx] == playerNum:
+                        winning_row.append(self.board[starting_idx])
+                except IndexError:
+                    continue
+            if len(winning_row) >= 3:
                 return True
-        
         else:
             return False
         
     def isWin(self, playerNum):
         index_dirs = [8, 9, 10]
         for idx in index_dirs:
-            print('index:', idx)
-            furthest = idx * 4
-            print('furthest:', furthest)
+            next = idx
             winning_row = []   
-            if self.recent_move + furthest in range(54) and self.board[self.recent_move + furthest] == playerNum:
-                smallest = self.recent_move
-                
-                winning_row.append(smallest)
-                winning_row.append(furthest)
-                incremented_idx = smallest + idx
-                for num in range(3): 
-                    
-                    if self.board[incremented_idx] == playerNum:
-                        winning_row.append(incremented_idx)
-                    incremented_idx = incremented_idx + idx
-
-                if len(winning_row) >= 5:
+            if self.recent_move + next in range(54) and self.board[self.recent_move + next] == playerNum:
+                start = self.recent_move 
+                incremented_idx = start + (idx * 2) 
+                for num in range(3):
+                    try:
+                        if self.board[incremented_idx] in range(54) and self.board[incremented_idx]  == playerNum:    
+                            winning_row.append(incremented_idx)
+                            incremented_idx += idx
+                    except IndexError:
+                        continue                   
+                if len(winning_row) >= 3:
                     return True 
-                
-            if self.recent_move - furthest in range(54) and self.board[self.recent_move - furthest] == playerNum:
-                smallest = furthest
-                winning_row.append(smallest)
-                winning_row.append(self.recent_move)
-                
-                incremented_idx = smallest + idx
+
+            if self.recent_move - next in range(54) and self.board[self.recent_move - next] == playerNum:
+                start = self.recent_move - next
+                incremented_idx = start - (idx * 2)
                 for num in range(3): 
-                    
-                    if self.board[incremented_idx] == playerNum:
-                        winning_row.append(incremented_idx)
-                    incremented_idx = incremented_idx + idx
-                if len(winning_row) >= 5:
+                    try:
+                        if self.board[incremented_idx] in range(54) and self.board[incremented_idx] == playerNum:
+                            winning_row.append(incremented_idx)
+                        incremented_idx -= idx
+                    except IndexError:
+                        continue
+                if len(winning_row) >= 3:
                     return True
                 
         return False
