@@ -1,7 +1,8 @@
 import socket
-from client import Player
-from board import Board
 from network import Network
+from _thread import *
+from player import Player
+from board import Board
 
 server = ""
 port = 5555
@@ -16,37 +17,54 @@ except socket.error as e:
 s.listen(2)
 print("Server started, listening for connections")
 
-players = [Player("Player 1"), Player("Player 2")]
+b = Board()
 
-def startNewGame():
-    valid_session = True
-    b = Board()
-    currentPlayer = 0
-    players[currentPlayer].getPlayerName()
-    players[currentPlayer + 1].getPlayerName()
 
-    while valid_session:
-        b.draw_board()
-          
-        valid_move = False
-        if b.isWin(currentPlayer) or b.isHorizontalWin(currentPlayer):
-            print(f"{players[currentPlayer].name} wins!")
-            break
-                
-        if b.moves_played > 54:
-            print(f"Tie! Game over")
-            break
-        if currentPlayer == 1:
-            currentPlayer = 0
-        else:
-            currentPlayer = 1
-            
-        while not valid_move:
-            user_move = input(f"It's {players[currentPlayer].name}'s turn - please enter column (1-9)")
-            valid_move = b.isMoveValid(int(user_move)-1, currentPlayer)
-            if valid_move:
-                continue 
+def read_pos(str):  
+    return int(str)
+
+
+def make_str(data):  
+    return str(data)
+
+
+playernumbers = [0, 1]
+
+
+def threaded_client(conn, player):  
+    conn.send(str.encode(make_str(playernumbers[player])))
+    # str.encode("Connected"),
+    reply = "hello"
+    while True:
+        try:  
+            data = read_pos(conn.recv(2048).decode())
+            #    see if client move is valid
+            #    valid_move = b.isMoveValid(int(data)-1, currentPlayer)
+            #
+            #     reply = valid_move
+            if not data:
+                print("Disconnected")
+                break
             else:
-                print("Move invalid, please choose another column")
+                print("Received: ", data)
+                print("Sending : ", reply)
+                
 
-startNewGame()
+            conn.sendall(str.encode(make_str(reply)))
+        except:
+            break
+
+    print("Lost connection")
+    conn.close()
+
+
+currentPlayer = 0
+while True:
+    # Wait for client connections
+    conn, addr = s.accept()
+    print("Connected to:", addr)
+   # print('currentPlayer', currentPlayer)
+
+    start_new_thread(threaded_client, (conn, currentPlayer))
+    currentPlayer += 1
+
